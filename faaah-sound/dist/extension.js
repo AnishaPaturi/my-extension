@@ -35,8 +35,10 @@ __export(extension_exports, {
 });
 module.exports = __toCommonJS(extension_exports);
 var vscode = __toESM(require("vscode"));
+var lastScreamTime = 0;
+var COOLDOWN_MS = 2e3;
 function activate(context) {
-  console.log("FAAAH extension activated \u{1F608}");
+  console.log("Ctrl+S of Shame activated \u{1F608}");
   const saveListener = vscode.workspace.onDidSaveTextDocument((document) => {
     checkForErrorsAndScream(document, context);
   });
@@ -50,28 +52,30 @@ function activate(context) {
 }
 function checkForErrorsAndScream(document, context) {
   const diagnostics = vscode.languages.getDiagnostics(document.uri);
-  const hasErrors = diagnostics.some(
+  const errorCount = diagnostics.filter(
     (d) => d.severity === vscode.DiagnosticSeverity.Error
-  );
-  if (hasErrors) {
+  ).length;
+  const now = Date.now();
+  if (errorCount > 0 && now - lastScreamTime > COOLDOWN_MS) {
+    lastScreamTime = now;
     playSound(context);
   }
 }
 function playSound(context) {
+  const sounds = ["faah1.mp3", "faah2.mp3", "faah3.mp3"];
+  const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
   const panel = vscode.window.createWebviewPanel(
-    "faahSound",
-    "FAAAH",
+    "ctrlSOfShame",
+    "",
     { preserveFocus: true, viewColumn: vscode.ViewColumn.Beside },
-    {
-      enableScripts: true
-    }
+    { enableScripts: true }
   );
   const soundUri = panel.webview.asWebviewUri(
-    vscode.Uri.joinPath(context.extensionUri, "media", "faah.mp3")
+    vscode.Uri.joinPath(context.extensionUri, "media", randomSound)
   );
   panel.webview.html = `
         <html>
-            <body>
+            <body style="background:transparent;">
                 <audio autoplay>
                     <source src="${soundUri}" type="audio/mpeg">
                 </audio>
