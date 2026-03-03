@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "play-sound": "^1.1.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.3"
   }
 }
