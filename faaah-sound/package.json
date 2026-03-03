@@ -1,6 +1,8 @@
 {
   "name": "ctrl-s-of-shame",
   "displayName": "Ctrl+S of Shame",
+  "publisher": "AnishaPaturi",
+  "icon": "icon.png",
   "description": "Every save is a gamble. Plays dramatic audio when you save code with errors.",
   "version": "0.0.1",
   "engines": {

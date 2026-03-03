@@ -1,96 +1,9 @@
-"use strict";
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-
-// src/extension.ts
-var extension_exports = {};
-__export(extension_exports, {
-  activate: () => activate,
-  deactivate: () => deactivate
-});
-module.exports = __toCommonJS(extension_exports);
-var vscode = __toESM(require("vscode"));
-var lastScreamTime = 0;
-var COOLDOWN_MS = 2e3;
-function activate(context) {
-  console.log("Ctrl+S of Shame activated \u{1F608}");
-  const saveListener = vscode.workspace.onDidSaveTextDocument((document) => {
-    checkForErrorsAndScream(document, context);
-  });
-  const debugListener = vscode.debug.onDidStartDebugSession(() => {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) return;
-    checkForErrorsAndScream(editor.document, context);
-  });
-  context.subscriptions.push(saveListener);
-  context.subscriptions.push(debugListener);
-}
-function checkForErrorsAndScream(document, context) {
-  const diagnostics = vscode.languages.getDiagnostics(document.uri);
-  const errorCount = diagnostics.filter(
-    (d) => d.severity === vscode.DiagnosticSeverity.Error
-  ).length;
-  const now = Date.now();
-  if (errorCount > 0 && now - lastScreamTime > COOLDOWN_MS) {
-    lastScreamTime = now;
-    playSound(context);
-  }
-}
-function playSound(context) {
-  const sounds = ["faah1.mp3", "faah2.mp3", "faah3.mp3"];
-  const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
-  const panel = vscode.window.createWebviewPanel(
-    "ctrlSOfShame",
-    "",
-    { preserveFocus: true, viewColumn: vscode.ViewColumn.Beside },
-    { enableScripts: true }
-  );
-  const soundUri = panel.webview.asWebviewUri(
-    vscode.Uri.joinPath(context.extensionUri, "media", randomSound)
-  );
-  panel.webview.html = `
+"use strict";var v=Object.create;var c=Object.defineProperty;var m=Object.getOwnPropertyDescriptor;var l=Object.getOwnPropertyNames;var p=Object.getPrototypeOf,h=Object.prototype.hasOwnProperty;var g=(e,o)=>{for(var s in o)c(e,s,{get:o[s],enumerable:!0})},a=(e,o,s,n)=>{if(o&&typeof o=="object"||typeof o=="function")for(let i of l(o))!h.call(e,i)&&i!==s&&c(e,i,{get:()=>o[i],enumerable:!(n=m(o,i))||n.enumerable});return e};var w=(e,o,s)=>(s=e!=null?v(p(e)):{},a(o||!e||!e.__esModule?c(s,"default",{value:e,enumerable:!0}):s,e)),f=e=>a(c({},"__esModule",{value:!0}),e);var y={};g(y,{activate:()=>b,deactivate:()=>D});module.exports=f(y);var t=w(require("vscode")),r=0,S=2e3;function b(e){console.log("Ctrl+S of Shame activated \u{1F608}");let o=t.workspace.onDidSaveTextDocument(n=>{d(n,e)}),s=t.debug.onDidStartDebugSession(()=>{let n=t.window.activeTextEditor;n&&d(n.document,e)});e.subscriptions.push(o),e.subscriptions.push(s)}function d(e,o){let n=t.languages.getDiagnostics(e.uri).filter(u=>u.severity===t.DiagnosticSeverity.Error).length,i=Date.now();n>0&&i-r>S&&(r=i,x(o))}function x(e){let o=["faah1.mp3","faah2.mp3","faah3.mp3"],s=o[Math.floor(Math.random()*o.length)],n=t.window.createWebviewPanel("ctrlSOfShame","",{preserveFocus:!0,viewColumn:t.ViewColumn.Beside},{enableScripts:!0}),i=n.webview.asWebviewUri(t.Uri.joinPath(e.extensionUri,"media",s));n.webview.html=`
         <html>
             <body style="background:transparent;">
                 <audio autoplay>
-                    <source src="${soundUri}" type="audio/mpeg">
+                    <source src="${i}" type="audio/mpeg">
                 </audio>
             </body>
         </html>
-    `;
-  setTimeout(() => {
-    panel.dispose();
-  }, 1e3);
-}
-function deactivate() {
-}
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  activate,
-  deactivate
-});
-//# sourceMappingURL=extension.js.map
+    `,setTimeout(()=>{n.dispose()},1e3)}function D(){}0&&(module.exports={activate,deactivate});
